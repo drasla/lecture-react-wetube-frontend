@@ -24,6 +24,9 @@ function SignUp() {
     const [isUsernameChecked, setIsUsernameChecked] = useState(false);
     const [usernameMessage, setUsernameMessage] = useState("");
 
+    const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+    const [nicknameMessage, setNicknameMessage] = useState("");
+
     const {
         register,
         handleSubmit,
@@ -55,11 +58,38 @@ function SignUp() {
             } else {
                 // 불가능하다라고 답변을 받으면 불가능하다는 것을 화면에 출력
                 setIsUsernameChecked(false);
-                setError("username", { message: message})
+                setError("username", { message: message });
             }
         } catch (e) {
             console.log(e);
             setError("username", { message: "중복 확인 중 오류가 발생되었습니다." });
+        }
+    };
+
+    const handleCheckNickname = async () => {
+        const nickname = getValues("nickName");
+        if (!nickname) {
+            setError("nickName", { message: "닉네임을 입력해주세요." });
+            return;
+        }
+
+        try {
+            const response = await api.post("/auth/check-nickname", {
+                nickname: nickname,
+            });
+            const { isAvailable, message } = response.data;
+
+            if (isAvailable) {
+                setIsNicknameChecked(true);
+                setNicknameMessage(message);
+                clearErrors("nickName");
+            } else {
+                setIsNicknameChecked(false);
+                setError("nickName", { message: message });
+            }
+        } catch (e) {
+            console.log(e);
+            setError("nickName", { message: "중복 확인 중 오류가 발생되었습니다." });
         }
     };
 
@@ -105,7 +135,7 @@ function SignUp() {
                                         // 허가 사항을 취소할 필요가 있음
                                         setIsUsernameChecked(false);
                                         setUsernameMessage("");
-                                    }
+                                    },
                                 })}
                                 error={errors.username?.message}
                             />
@@ -160,10 +190,16 @@ function SignUp() {
                             <Button
                                 type={"button"}
                                 variant={"secondary"}
+                                onClick={handleCheckNickname}
                                 className={twMerge(["w-32", "mt-6", "text-sm"])}>
                                 중복확인
                             </Button>
                         </div>
+                        {isNicknameChecked && (
+                            <p className={twMerge(["text-success-main", "text-xs", "mt-[-10px]"])}>
+                                {nicknameMessage}
+                            </p>
+                        )}
                     </div>
 
                     {/* 개인정보 */}
