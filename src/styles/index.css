@@ -13,6 +13,8 @@
 
     /* Divider */
     --divider: #E5E5E5;
+
+    --height-header: 56px;
 }
 
 /* 다크 모드 (html class="dark" 일 때 적용) */
@@ -37,6 +39,8 @@
        text-primary-main
        border-divider
     */
+
+    --height-header: var(--height-header);
 
     /* --- 가변 색상 (다크모드 대응) --- */
     --color-background-default: var(--bg-default);
