@@ -3,15 +3,17 @@ import { twMerge } from "tailwind-merge";
 import { FaYoutube } from "react-icons/fa";
 import Input from "../../components/ui/Input.tsx";
 import Button from "../../components/ui/Button.tsx";
-import { Link } from "react-router";
+import { Link, useNavigate} from "react-router";
 import { api } from "../../api/axios.ts";
 import { useState } from "react";
+import { useModalStore } from "../../store/useModalStore.ts";
+import type {AxiosError} from "axios";
 
 type SignUpFormData = {
     username: string;
     email: string;
     password: string;
-    nickName: string;
+    nickname: string;
     birthDate: string;
     phoneNumber: string;
     gender: "MALE" | "FEMALE";
@@ -21,17 +23,22 @@ type SignUpFormData = {
 };
 
 function SignUp() {
+    const navigate = useNavigate();
+
     const [isUsernameChecked, setIsUsernameChecked] = useState(false);
     const [usernameMessage, setUsernameMessage] = useState("");
 
     const [isNicknameChecked, setIsNicknameChecked] = useState(false);
     const [nicknameMessage, setNicknameMessage] = useState("");
 
+    const { openModal } = useModalStore();
+
     const {
         register,
         handleSubmit,
         getValues,
         setError,
+        setValue,
         clearErrors,
         formState: { errors, isSubmitting },
     } = useForm<SignUpFormData>();
@@ -67,9 +74,9 @@ function SignUp() {
     };
 
     const handleCheckNickname = async () => {
-        const nickname = getValues("nickName");
+        const nickname = getValues("nickname");
         if (!nickname) {
-            setError("nickName", { message: "닉네임을 입력해주세요." });
+            setError("nickname", { message: "닉네임을 입력해주세요." });
             return;
         }
 
@@ -82,16 +89,52 @@ function SignUp() {
             if (isAvailable) {
                 setIsNicknameChecked(true);
                 setNicknameMessage(message);
-                clearErrors("nickName");
+                clearErrors("nickname");
             } else {
                 setIsNicknameChecked(false);
-                setError("nickName", { message: message });
+                setError("nickname", { message: message });
             }
         } catch (e) {
             console.log(e);
-            setError("nickName", { message: "중복 확인 중 오류가 발생되었습니다." });
+            setError("nickname", { message: "중복 확인 중 오류가 발생되었습니다." });
         }
     };
+
+    const handleAddressSearch = () => {
+        openModal("ADDRESS_SEARCH", {
+            onComplete: (data: { zonecode: string, address: string }) => {
+                setValue("zipCode", data.zonecode, { shouldValidate: true });
+                setValue("address1", data.address, { shouldValidate: true });
+
+                // document.getElementById(요소의 ID)  => 화면에서, 해당 ID를 갖고 있는 요소를 선택
+                // 하지만 없을 수도 있기 때문에 그 타입은 Element | null
+                document.getElementById("address2")?.focus();
+            }
+        });
+    }
+
+    const onSubmit = async (formData: SignUpFormData) => {
+        if (!isUsernameChecked) {
+            alert("아이디 중복 확인을 해주세요.");
+            return;
+        }
+
+        if (!isNicknameChecked) {
+            alert("닉네임 중복 확인을 해주세요.");
+            return;
+        }
+
+        try {
+            await api.post("/auth/signup", formData);
+            alert("회원가입이 완료되었습니다! 로그인 해주세요.");
+            navigate("/sign-in");
+        } catch (e) {
+            // as 키워드는, 해당 객체를 강제로 형변환(타입변환) 하는 것
+            const axiosError = e as AxiosError<{ message: string }>;
+            const msg = axiosError.response?.data.message || "회원가입 실패";
+            alert(msg);
+        }
+    }
 
     return (
         <div
@@ -113,7 +156,7 @@ function SignUp() {
                     </p>
                 </div>
 
-                <form className={"space-y-6"}>
+                <form className={"space-y-6"} onSubmit={handleSubmit(onSubmit)}>
                     <div className={"space-y-4"}>
                         <h3
                             className={twMerge(
@@ -182,10 +225,10 @@ function SignUp() {
                             <Input
                                 label={"닉네임"}
                                 placeholder={"활동명을 입력해주세요"}
-                                registration={register("nickName", {
+                                registration={register("nickname", {
                                     required: "닉네임은 필수입니다.",
                                 })}
-                                error={errors.nickName?.message}
+                                error={errors.nickname?.message}
                             />
                             <Button
                                 type={"button"}
@@ -270,6 +313,7 @@ function SignUp() {
                             <Input
                                 readOnly
                                 placeholder={"우편번호"}
+                                onClick={handleAddressSearch}
                                 registration={register("zipCode", {
                                     required: "주소는 필수입니다.",
                                 })}
@@ -277,6 +321,7 @@ function SignUp() {
                             />
                             <Button
                                 type={"button"}
+                                onClick={handleAddressSearch}
                                 variant={"secondary"}
                                 className={twMerge(["w-32", "text-sm"])}>
                                 주소찾기
@@ -286,11 +331,13 @@ function SignUp() {
                         <Input
                             placeholder={"기본 주소"}
                             readOnly
+                            onClick={handleAddressSearch}
                             error={errors.address1?.message}
                             registration={register("address1", { required: "필수" })}
                         />
 
                         <Input
+                            id={"address2"}
                             placeholder={"상세 주소 (선택)"}
                             registration={register("address2")}
                         />
