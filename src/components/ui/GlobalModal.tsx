@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import Backdrop from "./Backdrop.tsx";
 import { MdClose } from "react-icons/md";
 import AddressSearchModal from "./modals/AddressSearchModal.tsx";
+import LoginRequiredModal from "./modals/LoginRequiredModal.tsx";
 
 function GlobalModal() {
     const { isOpen, type, props, closeModal } = useModalStore();
@@ -29,7 +30,10 @@ function GlobalModal() {
                     <MdClose size={32} />
                 </button>
 
-                {type === "ADDRESS_SEARCH" && <AddressSearchModal props={props} onClose={closeModal} />}
+                {type === "ADDRESS_SEARCH" && (
+                    <AddressSearchModal props={props} onClose={closeModal} />
+                )}
+                {type === "LOGIN_REQUIRED" && <LoginRequiredModal onClose={closeModal} />}
             </div>
         </div>
     );

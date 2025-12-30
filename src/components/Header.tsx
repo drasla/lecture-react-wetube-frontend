@@ -1,11 +1,28 @@
+import { type MouseEvent } from "react";
 import { twMerge } from "tailwind-merge";
 import { Link } from "react-router";
 import { MdCampaign, MdDarkMode, MdLightMode, MdMenu, MdSearch, MdVideoCall } from "react-icons/md";
 import { FaRegUserCircle, FaYoutube } from "react-icons/fa";
 import { useThemeStore } from "../store/useThemeStore.ts";
+import { useModalStore } from "../store/useModalStore.ts";
+import { useAuthStore } from "../store/useAuthStore.ts";
 
 function Header() {
     const { theme, toggleTheme } = useThemeStore();
+    const { openModal } = useModalStore();
+    const { isLoggedIn } = useAuthStore();
+
+    // MouseEvent 라는 이름의 타입이 Javascript에도 있고 React에도 있음
+    // 우리가 써야 하는건, React의 MouseEvent 타입이라 이를 명시적으로 수동으로 적어줘야 함
+    const handleUploadClick = (event: MouseEvent<HTMLAnchorElement>) => {
+        // 비회원이 누르면, 모달을 띄우고 끝내는 함수
+        if (!isLoggedIn) {
+            // a 태그에 onClick을 사용하고 있기 때문에 a의 기본 기능인 "이동"을 막을 필요가 있음
+            // 이벤트 버블링 : 클릭 이벤트 등의 이벤트가 상위 요소로 전파되는 현상
+            event.preventDefault();
+            openModal("LOGIN_REQUIRED");
+        }
+    }
 
     return (
         <header
@@ -73,6 +90,7 @@ function Header() {
                     )}
                 </button>
                 <Link
+                    onClick={handleUploadClick}
                     to={"/upload"}
                     className={twMerge(
                         ["flex", "items-center", "justify-center", "p-2"],
