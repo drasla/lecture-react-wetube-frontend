@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import Header from "../components/Header.tsx";
 import { useThemeStore } from "../store/useThemeStore.ts";
 import { useEffect } from "react";
+import GlobalModal from "../components/ui/GlobalModal.tsx";
 
 function Layout() {
     const { theme } = useThemeStore();
@@ -23,6 +24,7 @@ function Layout() {
             <main className={"p-4"}>
                 <Outlet />
             </main>
+            <GlobalModal />
         </div>
     );
 }
