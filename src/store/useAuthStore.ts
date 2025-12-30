@@ -5,7 +5,7 @@ type User = {
     id: number;
     username: string;
     email: string;
-    nickName: string;
+    nickname: string;
     birthDate: string;
     phoneNumber: string;
     gender: "MALE" | "FEMALE";
