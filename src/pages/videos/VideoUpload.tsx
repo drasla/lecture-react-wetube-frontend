@@ -1,8 +1,12 @@
 import { twMerge } from "tailwind-merge";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { MdCloudUpload, MdImage } from "react-icons/md";
 import Input from "../../components/ui/Input.tsx";
+import Button from "../../components/ui/Button.tsx";
+import { useNavigate } from "react-router";
+import { api } from "../../api/axios.ts";
+import type { AxiosError } from "axios";
 
 interface UploadFormData {
     title: string;
@@ -12,6 +16,8 @@ interface UploadFormData {
 }
 
 function VideoUpload() {
+    const navigate = useNavigate();
+
     const {
         register,
         handleSubmit,
@@ -52,6 +58,65 @@ function VideoUpload() {
         }
     }, [thumbnailFile]);
 
+    // 해시태그 관리용 코드
+    const [tagInput, setTagInput] = useState("");
+    const [tags, setTags] = useState<string[]>([]);
+
+    // KeyboardEvent는 Javascript 타입과 React 타입이 있어서 에러
+    // import { type KeyboardEvent } from "react"; 를 명시적으로 기재
+    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        // 엔터나 콤마를 사용자가 입력했을 때
+        if (event.key === "Enter" || event.key === ",") {
+            // submit의 기본 기능을 동작되지 않도록 함
+            event.preventDefault();
+            // trim() : string의 양 끝단에 존재하는 공백 제거
+            // replace(정규표현식, 대체문자열) : 정규표현식에 해당하는 문자열을 대체문자열로 변경
+            const newTag = tagInput.trim().replace(/^#/, "");
+            // includes() : 배열에 특정 요소가 존재하는지 확인
+            if (newTag && !tags.includes(newTag)) {
+                setTags([...tags, newTag]);
+                setTagInput("");
+            }
+        }
+    };
+
+    const removeTag = (tagToRemove: string) => {
+        // 외부에서 주입받은 tagToRemove에 해당하는 string과
+        // 내부 요소가 다른 것들만 필터링해서 출력한 뒤, tags state에 저장
+        setTags(tags.filter(tag => tag !== tagToRemove));
+    };
+
+    const onSubmit = async (data: UploadFormData) => {
+        try {
+            // onSubmit을 할 때 전달받은 정보는 UploadFormData 뿐임
+            // 그런데 그 내용에는 해시태그에 대한 내용이 없음
+
+            const formData = new FormData();    // 전달을 하려고 하는 FormData 형식을 새로 만들어줌
+            formData.append("title", data.title);
+            formData.append("description", data.description);
+            formData.append("video", data.video[0]);
+            formData.append("thumbnail", data.thumbnail[0]);
+            formData.append("hashtags", JSON.stringify(tags));
+
+            // 서버 전송
+            await api.post("/videos", formData, {
+                headers: {
+                    // 파일이 포함된 전송을 할 때에는 꼭. 필수로.
+                    // Content-Type을 multipart/form-data 로 해줘야 함.
+                    "Content-Type": "multipart/form-data",
+                }
+            });
+
+            alert("업로드가 완료 되었습니다!");
+            navigate("/");
+        } catch (e) {
+            console.log(e);
+            const axiosError = e as AxiosError<{ message: string }>;
+            const msg = axiosError.response?.data.message || "업로드 실패";
+            alert(msg);
+        }
+    }
+
     return (
         <div
             className={twMerge(
@@ -61,7 +126,7 @@ function VideoUpload() {
             <div className={twMerge(["w-full", "max-w-200", "space-y-6"])}>
                 <h1 className={twMerge(["text-2xl", "font-bold"])}>동영상 업로드</h1>
 
-                <form className={"space-y-8"}>
+                <form className={"space-y-8"} onSubmit={handleSubmit(onSubmit)}>
                     {/* 동영상 업로드 */}
                     <div className={"space-y-2"}>
                         <label className={twMerge(["block", "text-sm", "font-medium"])}>
@@ -192,6 +257,61 @@ function VideoUpload() {
                                 </p>
                             )}
                         </div>
+                    </div>
+
+                    {/* 해시 태그 */}
+                    <div className={"space-y-2"}>
+                        <label className={twMerge(["block", "text-sm", "font-medium"])}>
+                            해시태그
+                        </label>
+
+                        <div
+                            className={twMerge(
+                                ["flex", "flex-wrap", "gap-2", "p-3"],
+                                ["border", "border-divider", "rounded-md"],
+                                // focus-within 접두사 : 내 안의 자식들까지 포함해서 focus가 걸리면 발동
+                                ["focus-within:border-secondary-main"],
+                            )}>
+                            {/* 해시태그 자체 */}
+                            {tags.map(tag => (
+                                <span
+                                    key={tag}
+                                    className={twMerge(
+                                        ["flex", "items-center", "gap-1"],
+                                        ["bg-secondary-main/10", "text-secondary-main"],
+                                        ["px-2", "py-1", "rounded-full", "text-sm"],
+                                    )}>
+                                    #{tag}
+                                    <button
+                                        type={"button"}
+                                        onClick={() => removeTag(tag)}
+                                        className={twMerge(["hover:text-error-main"])}>
+                                        &times;
+                                    </button>
+                                </span>
+                            ))}
+
+                            {/* input */}
+                            <input
+                                value={tagInput}
+                                onChange={event => setTagInput(event.target.value)}
+                                // onKeyDown : 키보드를 누르면 발동시킬 함수를 작성
+                                onKeyDown={handleKeyDown}
+                                placeholder={"태그 입력 후 엔터 (예:브이로그)"}
+                                className={twMerge(["flex-1", "min-w-30", "outline-none"])}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={twMerge(["flex", "justify-end", "gap-2"])}>
+                        <Button type={"button"} variant={"ghost"}
+                        onClick={() => navigate("/")}
+                        >
+                            취소
+                        </Button>
+                        <Button type={"submit"} disabled={isSubmitting}>
+                            {isSubmitting ? "업로드 중..." : "업로드"}
+                        </Button>
                     </div>
                 </form>
             </div>
