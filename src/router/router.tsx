@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.tsx";
 import Home from "../pages/Home.tsx";
 import SignIn from "../pages/(auth)/SignIn.tsx";
 import SignUp from "../pages/(auth)/SignUp.tsx";
+import VideoUpload from "../pages/videos/VideoUpload.tsx";
 
 const router = createBrowserRouter([
     {
@@ -12,6 +13,9 @@ const router = createBrowserRouter([
             { path: "", element: <Home /> },
             { path: "sign-in", element: <SignIn /> },
             { path: "sign-up", element: <SignUp /> },
+            //    경로 : /videos/upload > Upload
+            //          /videos/:id    > Detail
+            { path: "videos", children: [{ path: "upload", element: <VideoUpload /> }] },
         ],
     },
 ]);

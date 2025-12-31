@@ -116,7 +116,7 @@ function Header() {
                     </button>
                     <Link
                         onClick={handleUploadClick}
-                        to={"/upload"}
+                        to={"/videos/upload"}
                         className={twMerge(
                             ["flex", "items-center", "justify-center", "p-2"],
                             ["rounded-full", "hover:bg-text-default/10"],
