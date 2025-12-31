@@ -19,6 +19,7 @@ import { useThemeStore } from "../store/useThemeStore.ts";
 import { useModalStore } from "../store/useModalStore.ts";
 import { useAuthStore } from "../store/useAuthStore.ts";
 import Backdrop from "./ui/Backdrop.tsx";
+import Avatar from "./ui/Avatar.tsx";
 
 function Header() {
     const navigate = useNavigate();
@@ -52,7 +53,7 @@ function Header() {
             <header
                 className={twMerge(
                     ["fixed", "top-0", "left-0", "right-0", "h-header", "px-4"],
-                    ["border-b", "border-divider"],
+                    ["border-b", "border-divider", "bg-background-paper"],
                     ["flex", "justify-between", "items-center"],
                     ["z-50"],
                 )}>
@@ -69,7 +70,11 @@ function Header() {
                 </div>
 
                 {/* 2. 중간 */}
-                <div className={twMerge(["flex-1", "max-w-[600px]"], ["flex", "items-center"])}>
+                <div
+                    className={twMerge(
+                        ["flex-1", "max-w-[600px]"],
+                        ["hidden", "md:flex", "items-center"],
+                    )}>
                     <div className={twMerge(["flex", "w-full"])}>
                         <input
                             placeholder={"검색"}
@@ -134,19 +139,12 @@ function Header() {
                                 <MdNotifications className={twMerge(["w-6", "h-6"])} />
                             </button>
                             <div className={"relative"}>
-                                <button
+                                <Avatar
+                                    size={"sm"}
+                                    nickname={user.nickname}
+                                    src={user.profileImage}
                                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                    className={twMerge(
-                                        ["w-8", "h-8", "flex", "justify-center", "items-center"],
-                                        ["rounded-full", "bg-primary-main", "text-sm", "font-bold"],
-                                        [
-                                            "text-primary-contrastText",
-                                            "hover:opacity-90",
-                                            "focus:outline-none",
-                                        ],
-                                    )}>
-                                    {user.nickname[0].toUpperCase()}
-                                </button>
+                                />
 
                                 {isMenuOpen && (
                                     <div
