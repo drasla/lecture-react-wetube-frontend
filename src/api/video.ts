@@ -25,5 +25,15 @@ export const fetchVideos = async () => {
     return response.data;
 }
 
+export const fetchVideo = async (videoId: number) => {
+    const response = await api.get<Video>(`/videos/${videoId}`);
+    return response.data;
+}
+
+export const toggleVideoLike = async (videoId: number) => {
+    const response = await api.post<{ isLiked: boolean }>(`/videos/${videoId}/like`);
+    return response.data;
+}
+
 
 
