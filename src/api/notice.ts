@@ -41,3 +41,9 @@ export const createNotice = async (title: string, content: string) => {
     const response = await api.post<Notice>("/notices", { title, content });
     return response.data;
 }
+
+// 공지사항 수정 API
+export const updateNotice = async (noticeId: number, data: { title: string; content: string}) => {
+    const response = await api.patch<Notice>(`/notices/${noticeId}`, data);
+    return response.data;
+}
