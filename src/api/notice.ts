@@ -35,3 +35,9 @@ export const deleteNotice = async (noticeId: number) => {
     const response = await api.delete(`/notices/${noticeId}`);
     return response.data;
 }
+
+// 공지사항 등록 API
+export const createNotice = async (title: string, content: string) => {
+    const response = await api.post<Notice>("/notices", { title, content });
+    return response.data;
+}
