@@ -16,7 +16,7 @@ type CommentListProps = {
 };
 
 function CommentList({ videoId }: CommentListProps) {
-    const { user, isLoggedIn } = useAuthStore();
+    const { user } = useAuthStore();
 
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
@@ -66,6 +66,8 @@ function CommentList({ videoId }: CommentListProps) {
             alert("댓글 삭제가 실패되었습니다.")
         }
     };
+
+    if (loading) return <div>로딩중</div>;
 
     return (
         <div className={"mt-6"}>
