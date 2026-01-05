@@ -7,6 +7,7 @@ import { useAuthStore } from "../../store/useAuthStore.ts";
 import { MdThumbUp, MdThumbUpOffAlt } from "react-icons/md";
 import { useModalStore } from "../../store/useModalStore.ts";
 import { toggleSubscription } from "../../api/subscription.ts";
+import CommentList from "../../components/comment/CommentList.tsx";
 
 function VideoDetail() {
     const { id } = useParams();
@@ -92,8 +93,6 @@ function VideoDetail() {
             setSubscriberCount(prevSubscriberCount);
         }
     }
-
-
 
     if (loading) {
         return <div className={twMerge(["pt-20", "text-center"])}>로딩 중...</div>;
@@ -199,6 +198,8 @@ function VideoDetail() {
                         </div>
                     </div>
                 </div>
+
+                <CommentList videoId={Number(id)}/>
             </div>
 
             {/* 오른쪽 영역 */}
