@@ -20,8 +20,16 @@ export interface Video {
     }
 }
 
-export const fetchVideos = async () => {
-    const response = await api.get<Video[]>("/videos");
+interface VideoListResponse {
+    videos: Video[],
+    total: number,
+    page: number,
+    totalPages: number,
+    hasNextPage: boolean,
+}
+
+export const fetchVideos = async (page = 1, limit = 24) => {
+    const response = await api.get<VideoListResponse>(`/videos?page=${page}&limit=${limit}`);
     return response.data;
 }
 

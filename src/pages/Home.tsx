@@ -11,7 +11,7 @@ function Home() {
         const loadVideos = async () => {
             try {
                 const result = await fetchVideos();
-                setVideos(result);
+                setVideos(result.videos);
             } catch (e) {
                 console.log(e);
             } finally {

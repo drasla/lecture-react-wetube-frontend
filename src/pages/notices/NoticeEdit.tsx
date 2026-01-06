@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router";
 import { useAuthStore } from "../../store/useAuthStore.ts";
 import { useForm } from "react-hook-form";
-import { createNotice, fetchNotice, updateNotice } from "../../api/notice.ts";
+import { fetchNotice, updateNotice } from "../../api/notice.ts";
 import { twMerge } from "tailwind-merge";
 import Input from "../../components/ui/Input.tsx";
 import Button from "../../components/ui/Button.tsx";
