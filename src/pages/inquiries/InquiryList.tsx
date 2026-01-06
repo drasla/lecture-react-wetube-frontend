@@ -112,6 +112,7 @@ function InquiryList() {
                     </tbody>
                 </table>
             </div>
+
         </div>
     );
 }

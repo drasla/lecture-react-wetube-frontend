@@ -5,6 +5,7 @@ import { fetchNotices, type Notice } from "../../api/notice.ts";
 import { twMerge } from "tailwind-merge";
 import Button from "../../components/ui/Button.tsx";
 import dayjs from "dayjs";
+import Pagination from "../../components/ui/Pagination.tsx";
 
 function NoticeList() {
     const navigate = useNavigate();
@@ -12,20 +13,29 @@ function NoticeList() {
 
     const [notices, setNotices] = useState<Notice[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const LIMIT = 20;
 
     useEffect(() => {
-        loadNotices().then(() => {});
-    }, []);
+        loadNotices(currentPage).then(() => {});
+    }, [currentPage]);
 
-    const loadNotices = async () => {
+    const loadNotices = async (page: number) => {
         try {
-            const data = await fetchNotices();
+            const data = await fetchNotices(page, LIMIT);
             setNotices(data.notices);
+            setTotalPages(data.totalPages);
         } catch (e) {
             console.log(e);
         } finally {
             setLoading(false);
         }
+    };
+
+    const onPageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo(0, 0);
     };
 
     return (
@@ -52,8 +62,12 @@ function NoticeList() {
                     )}>
                     <div className={twMerge(["w-1/12", "text-center"])}>번호</div>
                     <div className={twMerge(["flex-1", "text-center"])}>제목</div>
-                    <div className={twMerge(["w-1/6", "text-center", "hidden", "md:block"])}>날짜</div>
-                    <div className={twMerge(["w-1/12", "text-center", "hidden", "md:block"])}>조회</div>
+                    <div className={twMerge(["w-1/6", "text-center", "hidden", "md:block"])}>
+                        날짜
+                    </div>
+                    <div className={twMerge(["w-1/12", "text-center", "hidden", "md:block"])}>
+                        조회
+                    </div>
                 </div>
 
                 {/* 게시글 목록 */}
@@ -79,7 +93,8 @@ function NoticeList() {
                             <div className={twMerge(["flex-1", "text-center"])}>
                                 <Link to={`/notices/${notice.id}`}>{notice.title}</Link>
                             </div>
-                            <div className={twMerge(["w-1/6", "text-center", "hidden", "md:block"])}>
+                            <div
+                                className={twMerge(["w-1/6", "text-center", "hidden", "md:block"])}>
                                 {/*
                                          dayjs().format() : dayjs 날짜 타입을 정해진 포맷의 string으로 반환
                                          YYYY : 년도, YY : 년도의 뒤 두자리
@@ -91,13 +106,24 @@ function NoticeList() {
                                      */}
                                 {dayjs(notice.createdAt).format("YYYY.MM.DD")}
                             </div>
-                            <div className={twMerge(["w-1/12", "text-center", "hidden", "md:block"])}>
+                            <div
+                                className={twMerge([
+                                    "w-1/12",
+                                    "text-center",
+                                    "hidden",
+                                    "md:block",
+                                ])}>
                                 {notice.viewCount}
                             </div>
                         </div>
                     ))
                 )}
             </div>
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+            />
         </div>
     );
 }
