@@ -1,4 +1,4 @@
-import { type MouseEvent, useState } from "react";
+import { type FormEvent, type MouseEvent, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Link, useNavigate } from "react-router";
 import {
@@ -48,6 +48,14 @@ function Header() {
         navigate("/");
     };
 
+    const [keyword, setKeyword] = useState("");
+    const handleSearch = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!keyword.trim()) return;
+
+        navigate(`/results?q=${keyword}`);
+    }
+
     return (
         <>
             <header
@@ -75,9 +83,13 @@ function Header() {
                         ["flex-1", "max-w-[600px]"],
                         ["hidden", "md:flex", "items-center"],
                     )}>
-                    <div className={twMerge(["flex", "w-full"])}>
+                    <form
+                        onSubmit={handleSearch}
+                        className={twMerge(["flex", "w-full"])}>
                         <input
                             placeholder={"검색"}
+                            value={keyword}
+                            onChange={e => setKeyword(e.target.value)}
                             className={twMerge(
                                 ["w-full", "px-4", "py-2"],
                                 ["text-text-default", "placeholder:text-text-disabled"],
@@ -86,13 +98,14 @@ function Header() {
                             )}
                         />
                         <button
+                            type={"submit"}
                             className={twMerge(
                                 ["px-4", "py-2"],
                                 ["border", "border-l-0", "rounded-r-full", "border-divider"],
                             )}>
                             <MdSearch className={twMerge(["w-6", "h-6"])} />
                         </button>
-                    </div>
+                    </form>
                 </div>
 
                 {/* 3. 오른쪽 */}

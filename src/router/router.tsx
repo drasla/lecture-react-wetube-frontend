@@ -14,6 +14,7 @@ import InquiryList from "../pages/inquiries/InquiryList.tsx";
 import InquiryCreate from "../pages/inquiries/InquiryCreate.tsx";
 import InquiryDetail from "../pages/inquiries/InquiryDetail.tsx";
 import InquiryEdit from "../pages/inquiries/InquiryEdit.tsx";
+import SearchResults from "../pages/results/SearchResults.tsx";
 
 const router = createBrowserRouter([
     {
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
                     { path: ":id/edit", element: <InquiryEdit /> },
                 ],
             },
+            { path: "results", element: <SearchResults />}
         ],
     },
 ]);
