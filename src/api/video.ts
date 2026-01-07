@@ -51,4 +51,10 @@ export const searchVideos = async (query: string) => {
     return response.data;
 }
 
+// 구독 채널 영상 조회 API
+export const fetchSubscribedVideos = async () => {
+    const response = await api.get<Video[]>("/videos/subscribed");
+    return response.data;
+}
+
 
