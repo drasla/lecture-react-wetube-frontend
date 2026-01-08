@@ -17,6 +17,8 @@ import InquiryEdit from "../pages/inquiries/InquiryEdit.tsx";
 import SearchResults from "../pages/results/SearchResults.tsx";
 import Subscriptions from "../pages/channels/Subscriptions.tsx";
 import ChannelDetail from "../pages/channels/ChannelDetail.tsx";
+import AdminLayout from "../layouts/AdminLayout.tsx";
+import AdminDashboard from "../pages/admin/AdminDashboard.tsx";
 
 const router = createBrowserRouter([
     {
@@ -69,6 +71,13 @@ const router = createBrowserRouter([
             },
         ],
     },
+    {
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+            { index: true, element: <AdminDashboard />}
+        ]
+    }
 ]);
 
 export default router;

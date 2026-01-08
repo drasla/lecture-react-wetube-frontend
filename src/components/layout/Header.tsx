@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { Link, useNavigate } from "react-router";
 import {
     MdAccountBox,
+    MdAdminPanelSettings,
     MdCampaign,
     MdDarkMode,
     MdEdit,
@@ -56,7 +57,7 @@ function Header() {
         if (!keyword.trim()) return;
 
         navigate(`/results?q=${keyword}`);
-    }
+    };
 
     return (
         <>
@@ -86,9 +87,7 @@ function Header() {
                         ["flex-1", "max-w-[600px]"],
                         ["hidden", "md:flex", "items-center"],
                     )}>
-                    <form
-                        onSubmit={handleSearch}
-                        className={twMerge(["flex", "w-full"])}>
+                    <form onSubmit={handleSearch} className={twMerge(["flex", "w-full"])}>
                         <input
                             placeholder={"검색"}
                             value={keyword}
@@ -253,6 +252,31 @@ function Header() {
                                             ])}
                                         />
 
+                                        {user.role === "ADMIN" && (
+                                            <Link
+                                                to={"/admin"}
+                                                onClick={() => setIsMenuOpen(false)}
+                                                className={twMerge(
+                                                    [
+                                                        "w-full",
+                                                        "flex",
+                                                        "items-center",
+                                                        "gap-3",
+                                                        "px-4",
+                                                        "py-2",
+                                                    ],
+                                                    [
+                                                        "text-sm",
+                                                        "text-info-main",
+                                                        "hover:bg-info-main/5",
+                                                    ],
+                                                )}>
+                                                <MdAdminPanelSettings
+                                                    className={twMerge(["w-6", "h-6"])}
+                                                />
+                                                관리자 페이지
+                                            </Link>
+                                        )}
                                         <button
                                             className={twMerge(
                                                 [
